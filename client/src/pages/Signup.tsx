@@ -25,7 +25,7 @@ function Signup({
         email: email.trim(),
         password,
         options: {
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: 'https://4-eva-lyart.vercel.app',
           data: {
             name: name.trim(),
             username: username.trim(),
