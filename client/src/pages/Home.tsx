@@ -1,52 +1,125 @@
-
 import { useState } from 'react'
 import { supabase } from '../supabase'
 
+const artists = [
+  {
+    name: 'Tems',
+    category: 'Afrobeats · R&B',
+    initials: 'T',
+    color: 'from-emerald-700 to-teal-950',
+    description: 'A space for fans to connect and celebrate the music.',
+  },
+  {
+    name: 'Rema',
+    category: 'Afrobeats',
+    initials: 'R',
+    color: 'from-green-700 to-emerald-950',
+    description: 'Stay connected to the artist and the community.',
+  },
+  {
+    name: 'Ayra Starr',
+    category: 'Afropop',
+    initials: 'A',
+    color: 'from-teal-700 to-green-950',
+    description: 'Discover updates, conversations and fan moments.',
+  },
+]
+
+const fandoms = [
+  {
+    name: 'The Ravers',
+    artist: 'Rema',
+    members: 'Fan community',
+    initials: 'R',
+  },
+  {
+    name: 'Stargazers',
+    artist: 'Ayra Starr',
+    members: 'Fan community',
+    initials: 'A',
+  },
+  {
+    name: 'Rebel Gang',
+    artist: 'Tems',
+    members: 'Fan community',
+    initials: 'T',
+  },
+]
+
+const events = [
+  {
+    title: 'Fan Community Hangout',
+    date: 'Coming soon',
+    type: 'Community',
+  },
+  {
+    title: 'Exclusive Fan Experience',
+    date: 'Coming soon',
+    type: 'Fan experience',
+  },
+]
+
 function Home() {
   const [activeTab, setActiveTab] = useState('Home')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [signingOut, setSigningOut] = useState(false)
 
   const tabs = ['Home', 'Discover', 'Fandoms', 'Events']
 
   async function handleSignOut() {
+    setSigningOut(true)
+
     const { error } = await supabase.auth.signOut()
 
     if (error) {
       alert(error.message)
+      setSigningOut(false)
       return
     }
 
     window.location.reload()
   }
 
-  return (
-    <main className="min-h-screen bg-[#071A12] text-white">
-      <header className="sticky top-0 z-50 border-b border-emerald-900/60 bg-[#071A12]/95 backdrop-blur-xl">
-        <div className="mx-auto flex min-h-[76px] max-w-[1600px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-12">
+  function navigateTo(tab: string) {
+    setActiveTab(tab)
+    setMenuOpen(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
-          {/* Logo on the left */}
+  const sectionTitle = (title: string, subtitle: string) => (
+    <div className="mb-7">
+      <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+        {title}
+      </h2>
+      <p className="mt-2 text-sm leading-6 text-white/50 sm:text-base">
+        {subtitle}
+      </p>
+    </div>
+  )
+
+  return (
+    <main className="min-h-screen overflow-x-hidden bg-[#071A12] text-white">
+      {/* HEADER */}
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#071A12]/95 backdrop-blur-xl">
+        <div className="mx-auto flex min-h-[68px] max-w-[1500px] items-center justify-between gap-3 px-4 sm:px-6 lg:min-h-[76px] lg:px-10">
+
+          {/* LOGO */}
           <button
-            type="button"
-            onClick={() => setActiveTab('Home')}
-            className="shrink-0 text-3xl font-black tracking-tight"
-            aria-label="4EVA Home"
+            onClick={() => navigateTo('Home')}
+            className="shrink-0 text-2xl font-black tracking-tight sm:text-3xl"
           >
             4EVA<span className="text-emerald-400">.</span>
           </button>
 
-          {/* Navigation in the middle */}
-          <nav
-            aria-label="Main navigation"
-            className="flex min-w-0 flex-1 items-center justify-center gap-1 overflow-x-auto sm:gap-3 lg:gap-6"
-          >
+          {/* DESKTOP NAVIGATION */}
+          <nav className="hidden items-center gap-2 lg:flex">
             {tabs.map((tab) => (
               <button
                 key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                aria-current={activeTab === tab ? 'page' : undefined}
-                className={`whitespace-nowrap rounded-lg px-2 py-3 text-xs font-medium transition sm:px-3 sm:text-sm ${
+                onClick={() => navigateTo(tab)}
+                className={`rounded-full px-5 py-2.5 text-sm font-medium transition ${
                   activeTab === tab
-                    ? 'bg-emerald-500/10 text-emerald-300'
+                    ? 'bg-emerald-400/15 text-emerald-300'
                     : 'text-white/60 hover:bg-white/5 hover:text-white'
                 }`}
               >
@@ -55,141 +128,432 @@ function Home() {
             ))}
           </nav>
 
-          {/* Sign out on the far right */}
+          {/* DESKTOP SIGN OUT */}
           <button
-            type="button"
             onClick={handleSignOut}
-            className="shrink-0 rounded-full border border-emerald-400/30 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-400/10 sm:px-5 sm:text-sm"
+            disabled={signingOut}
+            className="hidden rounded-full border border-emerald-400/30 px-5 py-2.5 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-400/10 disabled:opacity-50 lg:block"
           >
-            Sign out
+            {signingOut ? 'Signing out...' : 'Sign Out'}
+          </button>
+
+          {/* MOBILE MENU BUTTON */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-white transition hover:bg-white/5 lg:hidden"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? (
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            )}
           </button>
         </div>
+
+        {/* MOBILE AND TABLET MENU */}
+        {menuOpen && (
+          <div className="border-t border-white/10 bg-[#0A2117] px-4 py-4 lg:hidden">
+            <nav className="mx-auto flex max-w-[1500px] flex-col gap-2">
+              {tabs.map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => navigateTo(tab)}
+                  className={`rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
+                    activeTab === tab
+                      ? 'bg-emerald-400/15 text-emerald-300'
+                      : 'text-white/70 hover:bg-white/5'
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+
+              <button
+                onClick={handleSignOut}
+                disabled={signingOut}
+                className="mt-2 rounded-xl border border-emerald-400/30 px-4 py-3 text-left text-sm font-semibold text-emerald-300 disabled:opacity-50"
+              >
+                {signingOut ? 'Signing out...' : 'Sign Out'}
+              </button>
+            </nav>
+          </div>
+        )}
       </header>
 
-      <section className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-14 lg:px-12">
-        {/* Hero section */}
+      <div className="mx-auto w-full max-w-[1500px] px-4 py-8 sm:px-6 sm:py-10 lg:px-10 lg:py-12">
+
+        {/* HOME SECTION */}
         {activeTab === 'Home' && (
-          <>
-            <div className="relative overflow-hidden rounded-3xl border border-emerald-400/15 bg-gradient-to-br from-emerald-950 via-[#10291D] to-[#071A12] p-7 sm:p-10 md:p-14">
-              <div className="pointer-events-none absolute -right-12 -top-16 h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl" />
+          <div className="space-y-14 sm:space-y-20">
 
-              <div className="relative">
-                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300 sm:text-sm">
-                  The culture lives here
+            {/* HERO */}
+            <section className="relative overflow-hidden rounded-3xl border border-emerald-400/15 bg-gradient-to-br from-[#103B28] via-[#0B2A1C] to-[#071A12] px-5 py-12 sm:px-10 sm:py-16 lg:px-16 lg:py-20">
+              <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl sm:h-96 sm:w-96" />
+
+              <div className="relative max-w-3xl">
+                <span className="inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-xs font-semibold tracking-wide text-emerald-300">
+                  OFFICIAL HOME OF AFRICAN FANDOMS
+                </span>
+
+                <h1 className="mt-7 text-4xl font-black leading-[1.12] tracking-tight sm:text-5xl lg:text-7xl">
+                  Fandom is more than following.
+                  <span className="block text-emerald-400">
+                    It is belonging.
+                  </span>
+                </h1>
+
+                <p className="mt-6 max-w-xl text-sm leading-7 text-white/60 sm:text-base sm:leading-8">
+                  Discover your favourite artists, find your people and
+                  experience the culture beyond the music. Your fandom
+                  deserves a home.
                 </p>
 
-                <h2 className="mt-5 max-w-2xl text-4xl font-black leading-tight sm:text-5xl md:text-6xl">
-                  Your people.
-                  <br />
-                  Your world.
-                  <br />
-                  <span className="text-emerald-400">Your 4EVA.</span>
-                </h2>
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <button
+                    onClick={() => navigateTo('Discover')}
+                    className="rounded-xl bg-emerald-400 px-7 py-3.5 text-sm font-bold text-[#071A12] transition hover:bg-emerald-300"
+                  >
+                    Explore artists
+                  </button>
 
-                <p className="mt-5 max-w-lg text-sm leading-7 text-white/65 sm:text-base">
-                  Connect with the artists you love, join their communities,
-                  and get closer to the moments that matter.
-                </p>
+                  <button
+                    onClick={() => navigateTo('Fandoms')}
+                    className="rounded-xl border border-white/15 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-white/5"
+                  >
+                    Find your fandom
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* INTRO */}
+            <section>
+              {sectionTitle(
+                'Discover the culture',
+                'Find artists and communities worth being part of.'
+              )}
+
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {artists.map((artist) => (
+                  <article
+                    key={artist.name}
+                    className="group min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-[#10291D] transition hover:-translate-y-1 hover:border-emerald-400/30"
+                  >
+                    <div className={`flex h-48 items-center justify-center bg-gradient-to-br ${artist.color} sm:h-56`}>
+                      <span className="text-7xl font-black text-white/20 transition group-hover:scale-110 sm:text-8xl">
+                        {artist.initials}
+                      </span>
+                    </div>
+
+                    <div className="p-5 sm:p-6">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
+                        Featured artist
+                      </p>
+
+                      <h3 className="mt-2 text-xl font-bold">
+                        {artist.name}
+                      </h3>
+
+                      <p className="mt-1 text-sm text-white/40">
+                        {artist.category}
+                      </p>
+
+                      <p className="mt-4 text-sm leading-6 text-white/60">
+                        {artist.description}
+                      </p>
+
+                      <button
+                        onClick={() => navigateTo('Discover')}
+                        className="mt-5 text-sm font-semibold text-emerald-300 transition hover:text-emerald-200"
+                      >
+                        Explore artist →
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            {/* FANDOMS PREVIEW */}
+            <section>
+              <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                <div>
+                  {sectionTitle(
+                    'Find your people',
+                    'Communities built around the artists you love.'
+                  )}
+                </div>
 
                 <button
-                  type="button"
-                  onClick={() => setActiveTab('Discover')}
-                  className="mt-8 rounded-xl bg-emerald-500 px-6 py-3 font-bold text-[#071A12] transition hover:bg-emerald-400"
+                  onClick={() => navigateTo('Fandoms')}
+                  className="mb-7 self-start text-sm font-semibold text-emerald-300 hover:text-emerald-200 sm:self-auto"
                 >
-                  Explore 4EVA
+                  View all fandoms →
                 </button>
               </div>
-            </div>
 
-            {/* Discover section */}
-            <div className="mt-12">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300 sm:text-sm">
-                Your next obsession
-              </p>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {fandoms.map((fandom) => (
+                  <article
+                    key={fandom.name}
+                    className="flex min-w-0 items-center gap-4 rounded-2xl border border-white/10 bg-[#10291D] p-5 transition hover:border-emerald-400/30"
+                  >
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-400/15 text-xl font-black text-emerald-300">
+                      {fandom.initials}
+                    </div>
 
-              <h3 className="mt-2 text-2xl font-bold sm:text-3xl">
-                Find your fandom
-              </h3>
-
-              <p className="mt-3 max-w-xl text-sm leading-7 text-white/55 sm:text-base">
-                Discover artist communities, follow updates, and connect
-                with fans who love the same things you do.
-              </p>
-
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <div className="rounded-2xl border border-white/10 bg-[#10291D]/60 p-6 transition duration-300 hover:-translate-y-1 hover:border-emerald-400/40">
-                  <span className="text-3xl">🎵</span>
-                  <h4 className="mt-4 text-lg font-bold">Music & Artists</h4>
-                  <p className="mt-2 text-sm leading-6 text-white/55">
-                    Get closer to the artists behind your favourite songs.
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-[#10291D]/60 p-6 transition duration-300 hover:-translate-y-1 hover:border-emerald-400/40">
-                  <span className="text-3xl">💚</span>
-                  <h4 className="mt-4 text-lg font-bold">Fan Communities</h4>
-                  <p className="mt-2 text-sm leading-6 text-white/55">
-                    Find your people and share the love.
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-[#10291D]/60 p-6 transition duration-300 hover:-translate-y-1 hover:border-emerald-400/40">
-                  <span className="text-3xl">✨</span>
-                  <h4 className="mt-4 text-lg font-bold">Exclusive Moments</h4>
-                  <p className="mt-2 text-sm leading-6 text-white/55">
-                    Stay close to special experiences and artist updates.
-                  </p>
-                </div>
+                    <div className="min-w-0">
+                      <h3 className="truncate font-bold">
+                        {fandom.name}
+                      </h3>
+                      <p className="mt-1 text-sm text-white/50">
+                        {fandom.artist}
+                      </p>
+                      <p className="mt-1 text-xs text-emerald-400">
+                        {fandom.members}
+                      </p>
+                    </div>
+                  </article>
+                ))}
               </div>
-            </div>
-          </>
+            </section>
+
+            {/* EVENTS PREVIEW */}
+            <section>
+              {sectionTitle(
+                'Experiences that bring us closer',
+                'Stay connected to the moments that matter.'
+              )}
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {events.map((event) => (
+                  <article
+                    key={event.title}
+                    className="rounded-2xl border border-white/10 bg-[#10291D] p-6 sm:p-7"
+                  >
+                    <span className="rounded-full bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-300">
+                      {event.type}
+                    </span>
+
+                    <h3 className="mt-5 text-lg font-bold sm:text-xl">
+                      {event.title}
+                    </h3>
+
+                    <p className="mt-2 text-sm text-white/50">
+                      {event.date}
+                    </p>
+
+                    <button
+                      onClick={() => navigateTo('Events')}
+                      className="mt-5 text-sm font-semibold text-emerald-300 hover:text-emerald-200"
+                    >
+                      Explore events →
+                    </button>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            {/* CALL TO ACTION */}
+            <section className="rounded-3xl border border-emerald-400/15 bg-[#0D3020] px-6 py-10 text-center sm:px-10 sm:py-14">
+              <h2 className="text-2xl font-black sm:text-3xl">
+                Your fandom. Your people. Your 4EVA.
+              </h2>
+
+              <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/55 sm:text-base">
+                The culture is bigger when we experience it together.
+                Find your community and be part of something special.
+              </p>
+
+              <button
+                onClick={() => navigateTo('Discover')}
+                className="mt-7 rounded-xl bg-emerald-400 px-7 py-3.5 text-sm font-bold text-[#071A12] hover:bg-emerald-300"
+              >
+                Start exploring
+              </button>
+            </section>
+          </div>
         )}
 
-        {/* Discover page */}
+        {/* DISCOVER SECTION */}
         {activeTab === 'Discover' && (
-          <div className="py-10">
-            <p className="text-sm font-semibold uppercase tracking-widest text-emerald-300">
-              Explore
-            </p>
-            <h2 className="mt-3 text-4xl font-black">Discover</h2>
-            <p className="mt-4 max-w-xl leading-7 text-white/60">
-              Find artists, explore fandoms, and discover your next favourite
-              community. Artist discovery features are coming next.
-            </p>
-          </div>
+          <section>
+            <div className="mb-10">
+              <p className="text-xs font-semibold tracking-[0.2em] text-emerald-400">
+                EXPLORE 4EVA
+              </p>
+
+              <h1 className="mt-3 text-3xl font-black sm:text-5xl">
+                Discover artists
+              </h1>
+
+              <p className="mt-3 max-w-xl text-sm leading-7 text-white/50 sm:text-base">
+                Find the artists you love and discover the communities
+                growing around them.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {artists.map((artist) => (
+                <article
+                  key={artist.name}
+                  className="overflow-hidden rounded-2xl border border-white/10 bg-[#10291D]"
+                >
+                  <div className={`flex h-48 items-center justify-center bg-gradient-to-br ${artist.color} sm:h-56`}>
+                    <span className="text-8xl font-black text-white/20">
+                      {artist.initials}
+                    </span>
+                  </div>
+
+                  <div className="p-5">
+                    <p className="text-xs font-semibold text-emerald-400">
+                      ARTIST PREVIEW
+                    </p>
+                    <h2 className="mt-2 text-xl font-bold">
+                      {artist.name}
+                    </h2>
+                    <p className="mt-1 text-sm text-white/50">
+                      {artist.category}
+                    </p>
+                    <p className="mt-4 text-sm leading-6 text-white/60">
+                      {artist.description}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
         )}
 
-        {/* Fandoms page */}
+        {/* FANDOMS SECTION */}
         {activeTab === 'Fandoms' && (
-          <div className="py-10">
-            <p className="text-sm font-semibold uppercase tracking-widest text-emerald-300">
-              Your communities
-            </p>
-            <h2 className="mt-3 text-4xl font-black">Fandoms</h2>
-            <p className="mt-4 max-w-xl leading-7 text-white/60">
-              Your favourite artist communities will live here. Join a fandom
-              to stay connected with the artists and fans you love.
-            </p>
-          </div>
+          <section>
+            <div className="mb-10">
+              <p className="text-xs font-semibold tracking-[0.2em] text-emerald-400">
+                YOUR COMMUNITY
+              </p>
+
+              <h1 className="mt-3 text-3xl font-black sm:text-5xl">
+                Explore fandoms
+              </h1>
+
+              <p className="mt-3 max-w-xl text-sm leading-7 text-white/50 sm:text-base">
+                A place for fans to connect, share their passion and
+                celebrate the artists they love.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {fandoms.map((fandom) => (
+                <article
+                  key={fandom.name}
+                  className="rounded-2xl border border-white/10 bg-[#10291D] p-6 transition hover:border-emerald-400/30"
+                >
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-400/15 text-xl font-black text-emerald-300">
+                    {fandom.initials}
+                  </div>
+
+                  <h2 className="mt-5 text-xl font-bold">
+                    {fandom.name}
+                  </h2>
+
+                  <p className="mt-2 text-sm text-white/50">
+                    For fans of {fandom.artist}
+                  </p>
+
+                  <p className="mt-3 text-xs text-emerald-400">
+                    {fandom.members}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
         )}
 
-        {/* Events page */}
+        {/* EVENTS SECTION */}
         {activeTab === 'Events' && (
-          <div className="py-10">
-            <p className="text-sm font-semibold uppercase tracking-widest text-emerald-300">
-              Never miss a moment
-            </p>
-            <h2 className="mt-3 text-4xl font-black">Events</h2>
-            <p className="mt-4 max-w-xl leading-7 text-white/60">
-              Artist announcements, fan experiences, meet and greets, and
-              upcoming events will appear here as we build them.
-            </p>
-          </div>
-        )}
-      </section>
+          <section>
+            <div className="mb-10">
+              <p className="text-xs font-semibold tracking-[0.2em] text-emerald-400">
+                BE PART OF THE MOMENT
+              </p>
 
-      <footer className="border-t border-emerald-900/50 px-6 py-6 text-center text-xs text-white/35">
-        Made for the fans who make the culture. © 4EVA
+              <h1 className="mt-3 text-3xl font-black sm:text-5xl">
+                Events and experiences
+              </h1>
+
+              <p className="mt-3 max-w-xl text-sm leading-7 text-white/50 sm:text-base">
+                Discover opportunities to connect with artists and
+                fellow fans through memorable experiences.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {events.map((event) => (
+                <article
+                  key={event.title}
+                  className="rounded-2xl border border-white/10 bg-[#10291D] p-6 sm:p-8"
+                >
+                  <span className="rounded-full bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-300">
+                    {event.type}
+                  </span>
+
+                  <h2 className="mt-6 text-xl font-bold">
+                    {event.title}
+                  </h2>
+
+                  <p className="mt-3 text-sm text-white/50">
+                    {event.date}
+                  </p>
+
+                  <p className="mt-5 text-sm leading-6 text-white/60">
+                    More details about upcoming experiences will
+                    appear here.
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+
+      {/* FOOTER */}
+      <footer className="border-t border-white/10 px-4 py-8 sm:px-6 lg:px-10">
+        <div className="mx-auto flex max-w-[1500px] flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
+          <p className="text-xl font-black">
+            4EVA<span className="text-emerald-400">.</span>
+          </p>
+
+          <p className="text-xs leading-6 text-white/40 sm:text-sm">
+            Made for the fans who make the culture.
+          </p>
+
+          <p className="text-xs text-white/30">
+            © 2026 4EVA. All rights reserved.
+          </p>
+        </div>
       </footer>
     </main>
   )
