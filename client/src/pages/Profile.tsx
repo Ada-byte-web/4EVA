@@ -361,7 +361,7 @@ function Profile({ onBack }: { onBack: () => void }) {
                   disabled={uploadingPhoto}
                   aria-label="Add or change profile picture"
                   title="Add profile picture"
-                  className="absolute -right-2 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border-2 border-[#10B981] bg-[#10291D] text-2xl font-light leading-none text-[#10B981] transition hover:bg-emerald-400/10 disabled:opacity-50"
+                  className="absolute -right-1 bottom-3 z-20 flex h-7 w-7 translate-y-0 items-center justify-center rounded-full border-2 border-[#10B981] bg-[#10291D] text-xl font-light leading-none text-[#10B981] transition hover:bg-emerald-400/10 disabled:opacity-50"
                 >
                   {uploadingPhoto ? (
                     <span className="text-xs">...</span>
