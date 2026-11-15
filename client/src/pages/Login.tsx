@@ -1,3 +1,4 @@
+
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../supabase'
 
@@ -10,6 +11,7 @@ function Login({
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState<'error' | 'success'>('error')
   const [loading, setLoading] = useState(false)
   const [resetLoading, setResetLoading] = useState(false)
 
@@ -25,9 +27,11 @@ function Login({
       })
 
       if (error) {
+        setMessageType('error')
         setMessage(error.message)
       }
     } catch {
+      setMessageType('error')
       setMessage('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
@@ -36,6 +40,7 @@ function Login({
 
   async function handleForgotPassword() {
     if (!email.trim()) {
+      setMessageType('error')
       setMessage('Enter your email address first.')
       return
     }
@@ -46,15 +51,20 @@ function Login({
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(
         email.trim(),
-        { redirectTo: window.location.origin }
+        { redirectTo: 'https://4-eva-lyart.vercel.app/' }
       )
 
-      setMessage(
-        error
-          ? error.message
-          : 'If an account exists for this email, a reset link will be sent. Check your inbox and spam folder.'
-      )
+      if (error) {
+        setMessageType('error')
+        setMessage(error.message)
+      } else {
+        setMessageType('success')
+        setMessage(
+          'If an account exists for this email, a reset link will be sent. Check your inbox and spam folder.'
+        )
+      }
     } catch {
+      setMessageType('error')
       setMessage('Unable to send the reset link. Please try again.')
     } finally {
       setResetLoading(false)
@@ -193,9 +203,13 @@ function Login({
 
         {message && (
           <p
-            role="status"
+            role={messageType === 'error' ? 'alert' : 'status'}
             aria-live="polite"
-            className="break-words text-center text-sm leading-6 text-emerald-200"
+            className={`break-words text-center text-sm leading-6 ${
+              messageType === 'error'
+                ? 'text-red-400'
+                : 'text-green-400'
+            }`}
           >
             {message}
           </p>

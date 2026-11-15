@@ -1,5 +1,7 @@
+
 import { useState } from 'react'
 import { supabase } from '../supabase'
+import Profile from './Profile'
 
 const artists = [
   {
@@ -61,10 +63,9 @@ const events = [
 
 function Home() {
   const [activeTab, setActiveTab] = useState('Home')
-  const [menuOpen, setMenuOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
 
-  const tabs = ['Home', 'Discover', 'Fandoms', 'Events']
+  const tabs = ['Home', 'Discover', 'Fandoms', 'Events', 'Profile']
 
   async function handleSignOut() {
     setSigningOut(true)
@@ -82,7 +83,6 @@ function Home() {
 
   function navigateTo(tab: string) {
     setActiveTab(tab)
-    setMenuOpen(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -99,6 +99,7 @@ function Home() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#071A12] text-white">
+
       {/* HEADER */}
       <header className="sticky top-0 z-50 border-b border-white/10 bg-[#071A12]/95 backdrop-blur-xl">
         <div className="mx-auto flex min-h-[68px] max-w-[1500px] items-center justify-between gap-3 px-4 sm:px-6 lg:min-h-[76px] lg:px-10">
@@ -137,72 +138,20 @@ function Home() {
             {signingOut ? 'Signing out...' : 'Sign Out'}
           </button>
 
-          {/* MOBILE MENU BUTTON */}
+          {/* MOBILE SIGN OUT */}
           <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-white transition hover:bg-white/5 lg:hidden"
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={menuOpen}
+            onClick={handleSignOut}
+            disabled={signingOut}
+            className="rounded-full border border-emerald-400/30 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-400/10 disabled:opacity-50 lg:hidden"
           >
-            {menuOpen ? (
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              >
-                <path d="M18 6 6 18M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              >
-                <path d="M4 7h16M4 12h16M4 17h16" />
-              </svg>
-            )}
+            {signingOut ? 'Signing out...' : 'Sign Out'}
           </button>
+
         </div>
-
-        {/* MOBILE AND TABLET MENU */}
-        {menuOpen && (
-          <div className="border-t border-white/10 bg-[#0A2117] px-4 py-4 lg:hidden">
-            <nav className="mx-auto flex max-w-[1500px] flex-col gap-2">
-              {tabs.map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => navigateTo(tab)}
-                  className={`rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
-                    activeTab === tab
-                      ? 'bg-emerald-400/15 text-emerald-300'
-                      : 'text-white/70 hover:bg-white/5'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
-
-              <button
-                onClick={handleSignOut}
-                disabled={signingOut}
-                className="mt-2 rounded-xl border border-emerald-400/30 px-4 py-3 text-left text-sm font-semibold text-emerald-300 disabled:opacity-50"
-              >
-                {signingOut ? 'Signing out...' : 'Sign Out'}
-              </button>
-            </nav>
-          </div>
-        )}
       </header>
 
-      <div className="mx-auto w-full max-w-[1500px] px-4 py-8 sm:px-6 sm:py-10 lg:px-10 lg:py-12">
+      {/* MAIN CONTENT */}
+      <div className="mx-auto w-full max-w-[1500px] px-4 pt-8 pb-28 sm:px-6 sm:pt-10 sm:pb-28 lg:px-10 lg:py-12">
 
         {/* HOME SECTION */}
         {activeTab === 'Home' && (
@@ -537,6 +486,12 @@ function Home() {
             </div>
           </section>
         )}
+
+        {/* PROFILE SECTION */}
+        {activeTab === 'Profile' && (
+          <Profile onBack={() => navigateTo('Home')} />
+        )}
+
       </div>
 
       {/* FOOTER */}
@@ -555,6 +510,87 @@ function Home() {
           </p>
         </div>
       </footer>
+
+      {/* MOBILE APP BOTTOM NAVIGATION */}
+      <nav className="fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 bg-[#071A12]/95 backdrop-blur-xl pb-[env(safe-area-inset-bottom)] lg:hidden">
+        <div className="mx-auto grid max-w-xl grid-cols-5">
+
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => navigateTo(tab)}
+              aria-label={tab}
+              aria-current={activeTab === tab ? 'page' : undefined}
+              className={`relative flex min-h-[68px] flex-col items-center justify-center gap-1 transition ${
+                activeTab === tab
+                  ? 'text-emerald-400'
+                  : 'text-white/45 hover:text-white/80'
+              }`}
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                {tab === 'Home' && (
+                  <>
+                    <path d="m3 10 9-7 9 7" />
+                    <path d="M5 9v12h14V9" />
+                    <path d="M9 21v-7h6v7" />
+                  </>
+                )}
+
+                {tab === 'Discover' && (
+                  <>
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="m20 20-4-4" />
+                    <path d="m13.5 8.5-1.5 4-4 1.5 1.5-4z" />
+                  </>
+                )}
+
+                {tab === 'Fandoms' && (
+                  <>
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </>
+                )}
+
+                {tab === 'Events' && (
+                  <>
+                    <rect x="3" y="5" width="18" height="16" rx="2" />
+                    <path d="M16 3v4M8 3v4M3 10h18" />
+                    <path d="m9 15 2 2 4-4" />
+                  </>
+                )}
+
+                {tab === 'Profile' && (
+                  <>
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 21a8 8 0 0 1 16 0" />
+                  </>
+                )}
+              </svg>
+
+              <span className="text-[10px] font-medium">
+                {tab}
+              </span>
+
+              {activeTab === tab && (
+                <span className="absolute bottom-1 h-1 w-5 rounded-full bg-emerald-400" />
+              )}
+            </button>
+          ))}
+
+        </div>
+      </nav>
+
     </main>
   )
 }

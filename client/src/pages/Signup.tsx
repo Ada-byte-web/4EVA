@@ -13,6 +13,7 @@ function Signup({
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState<'error' | 'success'>('error')
   const [loading, setLoading] = useState(false)
 
   async function handleSignup(e: FormEvent<HTMLFormElement>) {
@@ -34,15 +35,19 @@ function Signup({
       })
 
       if (error) {
+        setMessageType('error')
         setMessage(error.message)
       } else if (data.session) {
+        setMessageType('success')
         setMessage('Your account has been created successfully!')
       } else {
+        setMessageType('success')
         setMessage(
           'Your account has been created. Please check your email to confirm your account before signing in.'
         )
       }
     } catch {
+      setMessageType('error')
       setMessage('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
@@ -220,9 +225,13 @@ function Signup({
 
         {message && (
           <p
-            role="status"
+            role={messageType === 'error' ? 'alert' : 'status'}
             aria-live="polite"
-            className="break-words text-center text-sm leading-6 text-emerald-200"
+            className={`break-words text-center text-sm leading-6 ${
+              messageType === 'error'
+                ? 'text-red-400'
+                : 'text-green-400'
+            }`}
           >
             {message}
           </p>

@@ -200,10 +200,10 @@ function ResetPassword() {
 
         {message && (
           <p
-            role="status"
+            role={success ? 'status' : 'alert'}
             aria-live="polite"
             className={`break-words text-center text-sm leading-6 ${
-              success ? 'text-emerald-300' : 'text-emerald-100'
+              success ? 'text-green-400' : 'text-red-400'
             }`}
           >
             {message}
